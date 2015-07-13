@@ -3,7 +3,7 @@ NATS Lua library
 
 LUA client for NATS messaging system. https://nats.io
 
->  Note: phpnats is under heavy development.
+>  Note: lua-nats is under heavy development.
 
 by the [dawnangel][github]
 
