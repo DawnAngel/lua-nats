@@ -19,8 +19,8 @@ local network, request, response, command = {}, {}, {}, {}
 local client_prototype = {
     user          = nil,
     pass          = nil,
-    lang          = "lua",
-    version       = "0.0.1",
+    lang          = 'lua',
+    version       = '0.0.1',
     verbose       = false,
     pedantic      = false,
     trace         = false,
@@ -80,6 +80,8 @@ local function create_client(client_proto, client_socket, commands)
         socket = client_socket,
         read   = network.read,
         write  = network.write,
+        lread  = nil,
+        lwrite = nil,
     }
     -- assign client requests methods
     client.requests = {
@@ -94,14 +96,23 @@ end
 function network.write(client, buffer)
     if client.trace then print('->> '..buffer:sub(1,-3)) end
     local _, err = client.network.socket:send(buffer)
-    if err then client.error(err) end
+    if not err then
+        client.network.lwrite = buffer
+    else
+        client.error(err)
+    end
 end
 
 function network.read(client, len)
     if len == nil then len = '*l' end
     local line, err = client.network.socket:receive(len)
     if client.trace then print('<<- '..line) end
-    if not err then return line else client.error('connection error: ' .. err) end
+    if not err then
+        client.network.lread = line
+        return line
+    else
+        client.error('connection error: ' .. err)
+    end
 end
 
 -- ### Response methods ###
@@ -112,7 +123,7 @@ function response.read(client)
     local slices  = {}
     local data    = {}
 
-    for slice in payload:gmatch("[^%s]+") do
+    for slice in payload:gmatch('[^%s]+') do
         table.insert(slices, slice)
     end
 
@@ -129,7 +140,7 @@ function response.read(client)
         local length = slices[4]
 
         data.action    = 'MSG'
-        data.topic     = slices[2]
+        data.subject   = slices[2]
         data.unique_id = slices[3]
         -- ask for line ending chars and remove them
         data.content   = client.network.read(client, length+2):sub(1, -3)
@@ -138,6 +149,15 @@ function response.read(client)
     elseif slices[1] == 'INFO' then
         data.action  = 'INFO'
         data.content = slices[2]
+
+    -- INFO
+    elseif slices[1] == '+OK' then
+        data.action  = 'OK'
+
+    -- INFO
+    elseif slices[1] == '-ERR' then
+        data.action  = 'ERROR'
+        -- data.content = slices[2]
 
    -- unknown type of reply
     else
@@ -167,7 +187,7 @@ end
 -- ### Client prototype methods ###
 
 client_prototype.raw_cmd = function(client, buffer)
-    request.raw(client, buffer .. "\r\n")
+    request.raw(client, buffer .. '\r\n')
     return response.read(client)
 end
 
@@ -186,10 +206,6 @@ end
 
 client_prototype.set_pedantic = function(client, pedantic)
     client.pedantic = pedantic
-end
-
-client_prototype.set_reconnect = function(client, reconnect)
-    client.reconnect = reconnect
 end
 
 client_prototype.count_subscriptions = function(client)
@@ -321,10 +337,10 @@ function command.pong(client)
     request.raw(client, 'PONG\r\n')
 end
 
-function command.subscribe(client, topic, callback)
+function command.subscribe(client, subject, callback)
     uuid.seed()
     unique_id = uuid()
-    request.raw(client, 'SUB '..topic..' '..unique_id..'\r\n')
+    request.raw(client, 'SUB '..subject..' '..unique_id..'\r\n')
     client.subscriptions[unique_id] = callback
 
     return unique_id
@@ -335,9 +351,9 @@ function command.unsubscribe(client, unique_id)
     client.subscriptions[unique_id] = nil
 end
 
-function command.publish(client, topic, payload)
+function command.publish(client, subject, payload)
     request.raw(client, {
-        'PUB '..topic..' '..#payload..'\r\n',
+        'PUB '..subject..' '..#payload..'\r\n',
         payload..'\r\n',
     })
 end
