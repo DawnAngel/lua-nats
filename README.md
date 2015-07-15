@@ -25,6 +25,70 @@ libraries are copyright by their author 2015 (see the Creators
 file for details), and released under the MIT license (the same
 license as Lua itself). There is no warranty.
 
+
+Usage
+-----
+
+### Basic Usage (for subscribers)
+
+```lua
+local nats = require 'nats'
+
+local client = nats.connect({
+    host = '127.0.0.1',
+    port = 4222,
+})
+
+-- connect to the server
+client:connect()
+
+-- callback function for subscriptions
+local function subscribe_callback(payload)
+    print('Received data: ' .. payload)
+end
+
+-- subscribe to a subject
+local subscribe_id = client:subscribe('foo', subscribe_callback)
+
+-- wait until 2 messages come
+client:wait(2)
+
+-- unsubscribe from the subject
+client:unsubscribe(subscribe_id)
+```
+
+### Basic Usage (for publishers)
+
+```lua
+local nats = require 'nats'
+
+local client = nats.connect({
+    host = '127.0.0.1',
+    port = 4222,
+})
+
+-- connect to the server
+client:connect()
+
+-- publish to a subject
+local subscribe_id = client:publish('foo', 'message to be published')
+```
+
+Developer's Information
+-----------------------
+
+### Installation of the libraries
+
+To install the required libraries you can execute `make deps`.
+
+### Tests
+
+Tests are in the `tests` folder.
+To run them, you require:
+
+- `luarocks` and `telescope` installed.
+- execute `make test`.
+
 Creators
 --------
 
