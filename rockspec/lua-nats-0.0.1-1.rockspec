@@ -1,9 +1,9 @@
-package = "lua-nats"
-version = "0.0.1-0"
+package = "nats"
+version = "0.0.1-1"
 
 source = {
-   url = "http://cloud.github.com/downloads/dawnangel/lua-nats/lua-nats-0.0.1-0.tar.gz",
-   md5 = ""
+   url = "git://github.com/DawnAngel/lua-nats.git",
+   tag = "0.0.1"
 }
 
 description = {
@@ -11,8 +11,8 @@ description = {
    detailed = [[
       LUA client for NATS messaging system. https://nats.io
    ]],
-   homepage = "http://github.com/dawnangel/lua-nats",
-   license = "MIT"
+   homepage = "http://github.com/DawnAngel/lua-nats",
+   license = "MIT/X11"
 }
 
 dependencies = {
