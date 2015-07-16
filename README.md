@@ -29,7 +29,7 @@ license as Lua itself). There is no warranty.
 Usage
 -----
 
-### Basic Usage (for subscribers)
+### Basic usage: Subscribe / Unsubscribe
 
 ```lua
 local nats = require 'nats'
@@ -57,7 +57,7 @@ client:wait(2)
 client:unsubscribe(subscribe_id)
 ```
 
-### Basic Usage (for publishers)
+### Basic usage: Publish
 
 ```lua
 local nats = require 'nats'
@@ -72,6 +72,24 @@ client:connect()
 
 -- publish to a subject
 local subscribe_id = client:publish('foo', 'message to be published')
+```
+
+### Basic usage: User authentication
+
+```lua
+local nats = require 'nats'
+
+local client = nats.connect({
+    host = '127.0.0.1',
+    port = 4222,
+})
+
+-- user authentication
+local user, password = 'user', 'password'
+client:set_auth(user, password)
+
+-- connect to the server
+client:connect()
 ```
 
 Developer's Information
