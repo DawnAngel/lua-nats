@@ -5,9 +5,9 @@ LUA client for NATS messaging system. https://nats.io
 
 >  Note: lua-nats is under heavy development.
 
-by the [dawnangel][github]
+by [dawnangel][github]
 
-[github]: http://github.com/dawnangel/lua-nats/ "Github repository"
+[github]: http://github.com/dawnangel/ "Github repositories"
 
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://mit-license.org)
 
