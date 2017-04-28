@@ -109,4 +109,24 @@ context('NATS commands', function()
 
         assert_equal(client.network.lwrite:sub(1,3), 'PUB')
     end)
+
+    test('* REQ (client:request)', function()
+        local init_message = 'init message'
+        local reply_message = 'reply message'
+        local equal_init_message, equal_reply_message
+
+        client:subscribe('foo', function(message, reply)
+          equal_init_message = message == init_message
+          client:publish(reply, reply_message)
+        end)
+
+        client:request('foo', init_message, function(message)
+          equal_reply_message = message == reply_message
+        end)
+
+        client:wait(2)
+
+        assert_true(equal_init_message)
+        assert_true(equal_reply_message)
+    end)
 end)
