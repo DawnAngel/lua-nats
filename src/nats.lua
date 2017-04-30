@@ -347,7 +347,10 @@ end
 
 function command.request(client, subject, payload, callback)
     local inbox = create_inbox()
-    local unique_id = client:subscribe(inbox, callback)
+    unique_id = client:subscribe(inbox, function(message)
+        client:unsubscribe(unique_id)
+        callback(message)
+    end)
     client:publish(subject, payload, inbox)
     return unique_id, inbox
 end
