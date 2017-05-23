@@ -1,0 +1,32 @@
+language: c
+
+sudo: required
+
+services:
+  - docker
+
+env:
+  global:
+    - LUAROCKS=2.4.1
+  matrix:
+    - LUA=lua5.1
+    - LUA=lua5.2
+    - LUA=lua5.3
+    - LUA=luajit
+    - LUA=luajit2.0
+
+before_install:
+  - docker-compose up -d nats
+  - source .travis/setenv_lua.sh
+  - luarocks install telescope
+
+install:
+  - luarocks make rockspec/nats-0.0.3-1.rockspec
+
+script:
+  - make test
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always

@@ -1,6 +1,8 @@
 NATS Lua library
 ================
 
+![travis status](https://travis-ci.org/OystParis/lua-nats.svg?branch=master)
+
 LUA client for NATS messaging system. https://nats.io
 
 >  Note: lua-nats is under heavy development.
