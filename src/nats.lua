@@ -380,6 +380,18 @@ function command.publish(client, subject, payload, reply)
     })
 end
 
+function command.queuepublish(client, subject, queue, payload, reply)
+    if reply ~= nil then
+        reply = ' '..reply
+    else
+        reply = ''
+    end
+    request.raw(client, {
+        'PUB '..subject..reply..' '..queue..' '..#payload..'\r\n',
+        payload..'\r\n',
+    })
+end
+
 function command.wait(client, quantity)
     quantity = quantity or 0
 
@@ -408,6 +420,7 @@ nats.commands = {
     subscribe   = command.subscribe,
     unsubscribe = command.unsubscribe,
     publish     = command.publish,
+	queuepublish= command.queuepublish,
     wait        = command.wait,
 }
 
